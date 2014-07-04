@@ -20,26 +20,17 @@ import android.view.animation.DecelerateInterpolator;
 
 public class Fab extends View 
 {
-    Context _context;
-    Paint mButtonPaint, mDrawablePaint;
-    Bitmap  mBitmap;
-    int mScreenHeight;
-	float currentY;;
-    boolean mHidden = false;
+    private Paint mButtonPaint, mDrawablePaint;
+    private Bitmap  mBitmap;
 
     public Fab(Context context, AttributeSet attributeSet)
     {
         super(context, attributeSet);
-        _context = context;
-        init(Color.WHITE);
     }
     
-    @SuppressLint("NewApi")
 	public Fab(Context context)
     {
         super(context);
-        _context = context;
-        init(Color.WHITE);
     }
     
     public void setFabColor(int fabColor)
@@ -65,64 +56,29 @@ public class Fab extends View
         mButtonPaint.setShadowLayer(10.0f, 0.0f, 3.5f, Color.argb(100, 0, 0, 0));
         mDrawablePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         invalidate();
-        
-        WindowManager mWindowManager = (WindowManager) _context.getSystemService(Context.WINDOW_SERVICE);
-		Display display = mWindowManager.getDefaultDisplay();
-		Point size = new Point();
-		display.getSize(size);
-		mScreenHeight = size.y;
     }
     
     @Override
     protected void onDraw(Canvas canvas) 
     {
     	setClickable(true);
-        canvas.drawCircle(getWidth()/2, getHeight()/2,(float) (getWidth()/2.6), mButtonPaint);
-    	canvas.drawBitmap(mBitmap, (getWidth() - mBitmap.getWidth()) / 2, (getHeight() - mBitmap.getHeight()) / 2, mDrawablePaint);
+    	if(mButtonPaint != null) {
+	        canvas.drawCircle(getWidth()/2, getHeight()/2,(float) (getWidth()/2.6), mButtonPaint);
+	    	canvas.drawBitmap(mBitmap, (getWidth() - mBitmap.getWidth()) / 2, (getHeight() - mBitmap.getHeight()) / 2, mDrawablePaint);
+    	}
     }
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) 
 	{
-		if(event.getAction() == MotionEvent.ACTION_UP)
+		if(event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL)
 		{
 			setAlpha(1.0f);
 	    }
 		else if(event.getAction() == MotionEvent.ACTION_DOWN)
 	    {
-			setAlpha(0.6f);
+			setAlpha(0.8f);
 	    }
 		return super.onTouchEvent(event);
 	}
-    
-	public int dpToPx(int dp) 
-	{
-	    DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
-	    int px = Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));       
-	    return px;
-	}
-	
-	public void hideFab()
-	{
-		if(mHidden == false)
-		{
-			currentY = getY();
-			ObjectAnimator mHideAnimation = ObjectAnimator.ofFloat(this, "Y", mScreenHeight);
-			mHideAnimation.setInterpolator(new AccelerateInterpolator());
-			mHideAnimation.start();
-			mHidden = true;
-		}
-	}
-	
-	public void showFab()
-	{
-		if(mHidden == true)
-		{
-			ObjectAnimator mShowAnimation = ObjectAnimator.ofFloat(this, "Y", currentY);
-			mShowAnimation.setInterpolator(new DecelerateInterpolator());
-			mShowAnimation.start();
-			mHidden = false;
-		}
-	}
-    
 }
